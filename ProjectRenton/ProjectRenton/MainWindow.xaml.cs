@@ -88,8 +88,9 @@ namespace ProjectRenton
                 var window = (KeyValuePair<HWND, string>)list.SelectedItem;
                 PInvoke.SetForegroundWindow((HWND)window.Key);
 
-
                 var inputs = new INPUT[6];
+
+                // https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 
                 inputs[0].type = INPUT_typeFlags.INPUT_KEYBOARD;
                 inputs[0].Anonymous.ki.wVk = 0x11; //CTRL
@@ -112,11 +113,8 @@ namespace ProjectRenton
                 inputs[5].Anonymous.ki.wVk = 0x4B; //K
                 inputs[5].Anonymous.ki.dwFlags = keybd_eventFlags.KEYEVENTF_KEYUP;
 
-
-                await Task.Delay(1000);
-
-                var output = PInvoke.SendInput(inputs, 6);
-                await Task.Delay(1000);
+                // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendinput
+                PInvoke.SendInput(inputs, Marshal.SizeOf(typeof(INPUT)));
             }
         }
     }
