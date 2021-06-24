@@ -1,0 +1,10 @@
+﻿SetForegroundWindow
+FindWindowW
+EnumWindowsGetWindow
+GetShellWindow
+EnumWindows
+IsWindowVisible
+GetWindowTextLength
+GetWindowText
+SendInput
+GetLastError
