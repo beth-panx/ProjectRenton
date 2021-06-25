@@ -18,7 +18,12 @@ using Microsoft.Windows.Sdk;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-
+using Windows.Storage.Pickers;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.Graphics.Imaging;
+using Microsoft.UI.Xaml.Media.Imaging;
+using WinRT;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -116,6 +121,49 @@ namespace ProjectRenton
                 // https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendinput
                 PInvoke.SendInput(inputs, Marshal.SizeOf(typeof(INPUT)));
             }
+        }
+
+        private async void ButtonRun_Click(object sender, RoutedEventArgs e)
+        {
+            FileOpenPicker fileOpenPicker = new FileOpenPicker();
+            fileOpenPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            fileOpenPicker.FileTypeFilter.Add(".jpg");
+            fileOpenPicker.FileTypeFilter.Add(".png");
+            fileOpenPicker.ViewMode = PickerViewMode.Thumbnail;
+            var hwnd = this.As<IWindowNative>().WindowHandle;
+
+            //Make folder Picker work in Win32
+
+            var initializeWithWindow = fileOpenPicker.As<IInitializeWithWindow>();
+            initializeWithWindow.Initialize(hwnd);
+            fileOpenPicker.FileTypeFilter.Add("*");
+
+            StorageFile selectedStorageFile = await fileOpenPicker.PickSingleFileAsync();
+
+            SoftwareBitmap softwareBitmap;
+           
+            //UIPreviewImage.Source = imageSource;
+
+            //TODO: Make this model agnostic??
+
+            //Use Squeezenet model to classify image
+            var list = await HandRaiserModel.DetectObjects(selectedStorageFile);
+
+        }
+
+        [ComImport]
+        [Guid("3E68D4BD-7135-4D10-8018-9FB6D9F33FA1")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IInitializeWithWindow
+        {
+            void Initialize(IntPtr hwnd);
+        }
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("EECDBF0E-BAE9-4CB6-A68E-9598E1CB57BB")]
+        internal interface IWindowNative
+        {
+            IntPtr WindowHandle { get; }
         }
     }
 }

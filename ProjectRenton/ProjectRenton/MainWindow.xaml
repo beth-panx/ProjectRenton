@@ -11,5 +11,16 @@
         <ListView x:Name="list"></ListView>
         <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
         <Button x:Name="handButton" Click="handButton_Click">Toggle Hand Raised</Button>
+        <Button Name="ButtonRun"
+                    ToolTipService.ToolTip="Pick and evaluate and image"
+                    Width="100"
+                    Height="40"
+                    Click="ButtonRun_Click" 
+                    IsEnabled="True" 
+                    VerticalAlignment="Bottom" RenderTransformOrigin="2.085,7.842" Margin="84,0,0,654">
+            <Button.Content>
+                Pick image
+            </Button.Content>
+        </Button>
     </StackPanel>
 </Window>
