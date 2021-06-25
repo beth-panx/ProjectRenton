@@ -1,29 +1,18 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
+﻿using CommunityToolkit.WinUI.Helpers;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.Windows.Sdk;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-using Microsoft.Windows.Sdk;
-using System.Text;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Windows.Storage.Pickers;
-using Windows.Storage;
-using Windows.Storage.Streams;
+using System.Text;
 using Windows.Graphics.Imaging;
-using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 using WinRT;
+
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -37,9 +26,62 @@ namespace ProjectRenton
         [DllImport("USER32.DLL")]
         private static extern int GetWindowText(HWND hWnd, StringBuilder lpString, int nMaxCount);
 
+        private SoftwareBitmapSource _imageSource = new SoftwareBitmapSource();
+
+        private CameraHelper _cameraHelper;
+
         public MainWindow()
         {
             this.InitializeComponent();
+
+            PrepareCameraPreview();
+        }
+
+        private async void PrepareCameraPreview()
+        {
+            _cameraHelper = new CameraHelper();
+
+            var result = await _cameraHelper.InitializeAndStartCaptureAsync();
+
+            // Camera Initialization and Capture failed for some reason
+            if (result != CameraHelperResult.Success)
+            {
+                // get error information
+                var errorMessage = result.ToString();
+            }
+            else
+            {
+                // Set the image source to visualize
+                CameraVisual.Source = _imageSource;
+
+                // Subscribe to get frames as they arrive
+                _cameraHelper.FrameArrived += CameraHelper_FrameArrived;
+            }
+        }
+
+        DateTime _lastFrameTime;
+
+        private void CameraHelper_FrameArrived(object sender, FrameEventArgs e)
+        {
+            Debug.WriteLine("FrameArrived: " + DateTime.Now);
+
+        //    if (DateTime.Now - _lastFrameTime < TimeSpan.FromSeconds(1))
+        //    {
+        //        return;
+        //    }
+        //    _lastFrameTime = DateTime.Now;
+
+        //    DispatcherQueue.TryEnqueue(() =>
+        //    {
+        //        var videoFrame = e.VideoFrame;
+
+        //        //var softwareBitmap = SoftwareBitmap.Convert(videoFrame.SoftwareBitmap, BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
+
+        //        // convert software bitmap to image
+        //        //_imageSource.SetBitmapAsync(softwareBitmap);
+
+        //        Debug.WriteLine("Bitmap updated: " + DateTime.Now);
+        //    });
         }
 
         private void myButton_Click(object sender, RoutedEventArgs e)
